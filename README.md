@@ -17,6 +17,8 @@ Il suffit ensuite d'ouvrir le fichier `index.html` dans votre navigateur :
 xdg-open index.html  # ou double-cliquez sur le fichier depuis votre explorateur
 ```
 
+Un petit bouton en haut à droite de la page permet de basculer entre un thème clair et un thème sombre. Le choix effectué est enregistré dans `localStorage` afin d'être conservé lors des prochaines visites.
+
 ## Version de jsPDF
 
 La page charge **jsPDF** en version **2.5.1** :
