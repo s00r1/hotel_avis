@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hôtel Grill - Signalement / Avis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Librairies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <button class="theme-switcher" id="themeBtn" title="Basculer le thème">
+    <!-- ton SVG ici si tu veux -->
+  </button>
+  <div class="main-containers">
+    <div class="container container-buanderie">
+      <h2>🛎️ Hôtel Grill</h2>
+      <!-- FORMULAIRE PATCHÉ POUR FORMSPREE -->
+      <form id="mainForm" autocomplete="off" action="https://formspree.io/f/mqabbdyg" method="POST">
+        <label>Nom :</label>
+        <input type="text" id="nom" name="nom" required autocomplete="off">
+
+        <label>Numéro de chambre :</label>
+        <select id="chambre" name="chambre" required>
+          <option value="">Sélectionner</option>
+          <!-- Options générées par JS -->
+        </select>
+
+        <div class="multi-list" id="multiList"></div>
+        <div id="wizard-area"></div>
+
+        <div class="btn-row hidden" id="btnRow">
+          <button type="button" class="modern-btn" id="add-btn">
+            Ajouter un autre
+          </button>
+          <button type="submit" class="modern-btn" id="send-btn">
+            Envoyer
+          </button>
+        </div>
+
+        <!-- CHAMP CACHÉ POUR LES DÉTAILS (wizard/message) -->
+        <input type="hidden" id="hiddenMessage" name="message">
+
+        <!-- Pour page de remerciement custom, décommente ci-dessous -->
+        <!--
+        <input type="hidden" name="_next" value="https://tonsite.github.io/merci.html">
+        -->
+      </form>
+    </div>
+  </div>
+  <!-- SCRIPT À LA FIN pour que le DOM soit prêt -->
+  <script src="script.js"></script>
+</body>
+</html>
