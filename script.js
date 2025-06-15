@@ -375,6 +375,7 @@ document.getElementById('mainForm').onsubmit = function(e){
   // Génère code intervention et PDF pour le client
   const codeInter = genCodeIntervention();
   const jsPDF = window.jspdf?.jsPDF || window.jsPDF;
+  let savePromise = Promise.resolve();
   if (jsPDF) {
     const doc = new jsPDF();
     const now = new Date();
@@ -432,7 +433,7 @@ document.getElementById('mainForm').onsubmit = function(e){
       y += 8;
       doc.setFontSize(12);
     });
-    doc.save(`signalement_${codeInter}.pdf`);
+    savePromise = doc.save(`signalement_${codeInter}.pdf`, { returnPromise: true });
   }
 
   // Prépare tout le contenu pour le champ caché message (pour Formspree)
@@ -460,8 +461,7 @@ document.getElementById('mainForm').onsubmit = function(e){
   });
   document.getElementById('hiddenMessage').value = hiddenMsg;
 
-  // Envoie du formulaire après génération PDF (laisse 400ms pour download propre)
-  setTimeout(function() {
+  savePromise.then(() => {
     document.getElementById('mainForm').submit();
 
     // Reset wizard & UI après envoi
@@ -474,7 +474,7 @@ document.getElementById('mainForm').onsubmit = function(e){
     multi = [];
     renderWizard();
     renderMultiList();
-  }, 400);
+  });
 
   return false;
 };
