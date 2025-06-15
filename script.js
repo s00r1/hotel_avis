@@ -72,6 +72,16 @@ let autreSaisie = "";
 let avisSaisie = "";
 let multi = [];
 
+// Echappe les caract\xC3\xA8res HTML pour eviter l\x27interpretation des balises
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // --------- Remplir chambres ---------
 function fillChambres(){
   let sel = document.getElementById('chambre');
@@ -93,10 +103,10 @@ function renderMultiList() {
     div.className = "multi-item";
     let label = "";
     if (item.type === "avis") {
-      label = `<span class="multi-type">Avis :</span> ${item.texte}`;
+      label = `<span class="multi-type">Avis :</span> ${escapeHtml(item.texte)}`;
     } else {
-      label = `<span class="multi-type">Signalement :</span> ${item.chemin.join(" > ")}`;
-      if(item.texte) label += ` (${item.texte})`;
+      label = `<span class="multi-type">Signalement :</span> ${escapeHtml(item.chemin.join(" > "))}`;
+      if(item.texte) label += ` (${escapeHtml(item.texte)})`;
     }
     div.innerHTML = label + `<span class="del" title="Supprimer" onclick="delMulti(${idx})">&times;</span>`;
     list.appendChild(div);
