@@ -7,6 +7,14 @@ Ce petit projet propose un formulaire permettant aux clients de signaler un prob
 ```bash
 git clone <URL-du-dépôt>
 cd hotel_avis
+npm install
+```
+
+Vous pouvez ensuite lancer les tests et le linter :
+
+```bash
+npm test
+npm run lint
 ```
 
 ## Ouvrir l'application
