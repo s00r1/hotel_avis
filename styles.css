@@ -260,6 +260,33 @@ select, input, textarea {
   width: 1.5em;
   height: 1.5em;
 }
+.chambres-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+.chambre-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.add-chambre-btn {
+  background: #f3f3f8;
+  border: none;
+  color: #2176ae;
+  font-weight: bold;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.del-chambre-btn {
+  background: none;
+  border: none;
+  color: #d22;
+  font-size: 1.2em;
+  cursor: pointer;
+}
 
 #themeIcon .sun,
 #themeIcon .moon {
