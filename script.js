@@ -460,20 +460,20 @@ document.getElementById('mainForm').onsubmit = function(e){
   });
   document.getElementById('hiddenMessage').value = hiddenMsg;
 
-  // Reset wizard & UI avant envoi
-  document.getElementById('mainForm').reset();
-  chemin = [];
-  autreSaisie = "";
-  avisSaisie = "";
-  conflitChambres = [];
-  conflitComment = "";
-  multi = [];
-  renderWizard();
-  renderMultiList();
-
   // Envoie du formulaire après génération PDF (laisse 400ms pour download propre)
   setTimeout(function() {
     document.getElementById('mainForm').submit();
+
+    // Reset wizard & UI après envoi
+    document.getElementById('mainForm').reset();
+    chemin = [];
+    autreSaisie = "";
+    avisSaisie = "";
+    conflitChambres = [];
+    conflitComment = "";
+    multi = [];
+    renderWizard();
+    renderMultiList();
   }, 400);
 
   return false;
