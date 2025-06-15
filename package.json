@@ -4,7 +4,7 @@
   "description": "Ce petit projet propose un formulaire permettant aux clients de signaler un problème technique ou de laisser un avis concernant leur séjour à l'hôtel. Lors de la soumission, un PDF récapitulatif est généré grâce à la librairie **jsPDF** puis le contenu du formulaire est envoyé via **Formspree**.",
   "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "eslint ."
   },
   "keywords": [],
@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "eslint": "^9.29.0"
+    "eslint": "^9.29.0",
+    "jest": "^30.0.0"
   }
 }
