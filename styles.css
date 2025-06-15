@@ -261,6 +261,14 @@ select, input, textarea {
   height: 1.5em;
 }
 
+#themeIcon .sun,
+#themeIcon .moon {
+  pointer-events: none;
+}
+#themeIcon .moon {
+  display: none;
+}
+
 /* ----------- Responsive mobile ----------- */
 @media (max-width: 600px) {
   .container {
