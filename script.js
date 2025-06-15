@@ -25,7 +25,13 @@ const arbre = {
   "Lumières": ["Lumière chambre", "Lumière salle de bain"],
   "Chauffage": ["Chauffage HS"],
   "Nuisibles": ["Cafards", "Punaises de lit"],
-  "Parties communes": ["Problème lave-linge", "Problème sèche-linge", "Problème cuisine", "Problème casiers", "Autres"]
+  "Parties communes": ["Problème lave-linge", "Problème sèche-linge", "Problème cuisine", "Problème casiers", "Autres"],
+  "Incident": ["Conflit", "Alarme incendie"],
+  "Conflit": [
+    "Conflit entre plusieurs chambres",
+    "Conflit dans la même famille",
+    "Conflit avec personne extérieure à l'hôtel"
+  ]
 };
 const CHOIX_STYLES = {
   "Eau":            { color:"bleu",    icon:'💧' },
@@ -50,6 +56,11 @@ const CHOIX_STYLES = {
   "Chauffage HS":   { color:"orange",  icon:'🔥' },
 
   "Incident":       { color:"rouge",   icon:'⚠️' },
+  "Conflit":        { color:"rouge",   icon:'⚔️' },
+  "Alarme incendie":{ color:"orange",  icon:'🚨' },
+  "Conflit entre plusieurs chambres":       { color:"rouge", icon:'🏘️' },
+  "Conflit dans la même famille":            { color:"rouge", icon:'👪' },
+  "Conflit avec personne extérieure à l'hôtel": { color:"rouge", icon:'🚶' },
   "Nuisibles":      { color:"vert",    icon:'🐞' },
   "Cafards":        { color:"vert",    icon:'🪳' },
   "Punaises de lit":{ color:"vert",    icon:'🛏️' },
@@ -71,6 +82,8 @@ let chemin = [];
 let autreSaisie = "";
 let avisSaisie = "";
 let multi = [];
+let conflitChambres = [];
+let conflitComment = "";
 
 // Echappe les caract\xC3\xA8res HTML pour eviter l\x27interpretation des balises
 function escapeHtml(str) {
@@ -78,7 +91,7 @@ function escapeHtml(str) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -92,6 +105,17 @@ function fillChambres(){
   }
 }
 fillChambres();
+
+function createChambreSelect(val=""){
+  let sel = document.createElement('select');
+  sel.innerHTML = `<option value="">Sélectionner</option>`;
+  for(let i=1; i<=54; i++){
+    if(i === 13) continue;
+    sel.innerHTML += `<option value="${i}">Chambre ${i}</option>`;
+  }
+  sel.value = val;
+  return sel;
+}
 
 // --------- Liste multi ---------
 function renderMultiList() {
@@ -134,6 +158,8 @@ function renderWizard() {
       chemin.pop();
       autreSaisie = "";
       avisSaisie = "";
+      conflitChambres = [];
+      conflitComment = "";
       renderWizard();
     }
     area.appendChild(backBtn);
@@ -148,6 +174,8 @@ function renderWizard() {
         chemin = chemin.slice(0, idx+1);
         autreSaisie = "";
         avisSaisie = "";
+        conflitChambres = [];
+        conflitComment = "";
         renderWizard();
       }
       bc.appendChild(sp);
@@ -174,6 +202,58 @@ function renderWizard() {
     btnRow.classList.remove('hidden');
     return;
   }
+  let last = chemin[chemin.length-1];
+  const conflits = [
+    "Conflit entre plusieurs chambres",
+    "Conflit dans la même famille",
+    "Conflit avec personne extérieure à l'hôtel"
+  ];
+  if (conflits.includes(last)) {
+    if(conflitChambres.length === 0) conflitChambres.push("");
+    const label = document.createElement('label');
+    label.textContent = last === "Conflit avec personne extérieure à l'hôtel" ?
+      "Chambres concernées (optionnel) :" : "Chambres concernées :";
+    area.appendChild(label);
+    const list = document.createElement('div');
+    list.className = 'chambres-list';
+    conflitChambres.forEach((val, idx) => {
+      const div = document.createElement('div');
+      div.className = 'chambre-item';
+      const sel = createChambreSelect(val);
+      sel.onchange = e => conflitChambres[idx] = e.target.value;
+      div.appendChild(sel);
+      if(last !== "Conflit dans la même famille") {
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'del-chambre-btn';
+        del.textContent = '×';
+        del.onclick = () => { conflitChambres.splice(idx,1); renderWizard(); };
+        div.appendChild(del);
+      }
+      list.appendChild(div);
+    });
+    area.appendChild(list);
+    if(last !== "Conflit dans la même famille") {
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'add-chambre-btn';
+      add.textContent = '+';
+      add.onclick = () => { conflitChambres.push(""); renderWizard(); };
+      area.appendChild(add);
+    }
+    if(last === "Conflit avec personne extérieure à l'hôtel") {
+      const lab = document.createElement('label');
+      lab.textContent = "Commentaire :";
+      area.appendChild(lab);
+      const ta = document.createElement('textarea');
+      ta.rows = 3;
+      ta.value = conflitComment;
+      ta.oninput = e => conflitComment = e.target.value;
+      area.appendChild(ta);
+    }
+    btnRow.classList.remove('hidden');
+    return;
+  }
   if (chemin.length > 0 && arbre[chemin[chemin.length-1]] === undefined) {
     if (chemin[chemin.length-1] === "Autres") {
       const label = document.createElement('label');
@@ -189,7 +269,7 @@ function renderWizard() {
     } else {
       const div = document.createElement('div');
       div.className = "path-end";
-      div.innerHTML = `👉 Problème sélectionné : <br><b>${chemin.join(" > ")}</b>`;
+      div.innerHTML = `👉 Problème sélectionné : <br><b>${chemin.join(" > ")}</b>`;
       area.appendChild(div);
     }
     btnRow.classList.remove('hidden');
@@ -227,9 +307,16 @@ document.getElementById('add-btn').onclick = function() {
     let label = chemin.join(" > ");
     if (!label) { alert("Sélectionne au moins un choix."); return; }
     let texte = "";
-    if (chemin[chemin.length-1] === "Autres") {
+    let last = chemin[chemin.length-1];
+    if (last === "Autres") {
       if(!autreSaisie.trim()) { alert("Décris ton problème !"); return;}
       texte = autreSaisie.trim();
+    } else if(["Conflit entre plusieurs chambres","Conflit dans la même famille","Conflit avec personne extérieure à l'hôtel"].includes(last)) {
+      let chs = conflitChambres.filter(x=>x).join(', ');
+      if(chs) texte = 'Chambres: ' + chs;
+      if(last === "Conflit avec personne extérieure à l'hôtel" && conflitComment.trim()) {
+        texte += (texte ? ' - ' : '') + conflitComment.trim();
+      }
     }
     multi.push({type: "signalement", chemin: [...chemin], texte});
   }
@@ -237,6 +324,8 @@ document.getElementById('add-btn').onclick = function() {
   chemin = [];
   autreSaisie = "";
   avisSaisie = "";
+  conflitChambres = [];
+  conflitComment = "";
   renderWizard();
 }
 
@@ -261,9 +350,16 @@ document.getElementById('mainForm').onsubmit = function(e){
       let label = chemin.join(" > ");
       if (!label) { alert("Sélectionne au moins un choix."); return; }
       let texte = "";
-      if (chemin[chemin.length-1] === "Autres") {
+      let last = chemin[chemin.length-1];
+      if (last === "Autres") {
         if(!autreSaisie.trim()) { alert("Décris ton problème !"); return;}
         texte = autreSaisie.trim();
+      } else if(["Conflit entre plusieurs chambres","Conflit dans la même famille","Conflit avec personne extérieure à l'hôtel"].includes(last)) {
+        let chs = conflitChambres.filter(x=>x).join(', ');
+        if(chs) texte = 'Chambres: ' + chs;
+        if(last === "Conflit avec personne extérieure à l'hôtel" && conflitComment.trim()) {
+          texte += (texte ? ' - ' : '') + conflitComment.trim();
+        }
       }
       multi.push({type: "signalement", chemin: [...chemin], texte});
     }
@@ -271,6 +367,8 @@ document.getElementById('mainForm').onsubmit = function(e){
     chemin = [];
     autreSaisie = "";
     avisSaisie = "";
+    conflitChambres = [];
+    conflitComment = "";
     renderWizard();
   }
 
@@ -367,6 +465,8 @@ document.getElementById('mainForm').onsubmit = function(e){
   chemin = [];
   autreSaisie = "";
   avisSaisie = "";
+  conflitChambres = [];
+  conflitComment = "";
   multi = [];
   renderWizard();
   renderMultiList();
@@ -380,18 +480,6 @@ document.getElementById('mainForm').onsubmit = function(e){
 };
 
 // Ajoute ou met à jour un champ hidden dans le formulaire (pour Formspree)
-function setOrUpdateHidden(name, value) {
-  let form = document.getElementById('mainForm');
-  let input = form.querySelector('input[name="'+name+'"]');
-  if(!input) {
-    input = document.createElement('input');
-    input.type = "hidden";
-    input.name = name;
-    form.appendChild(input);
-  }
-  input.value = value;
-}
-
 // --------- THEME SWITCHER ---------
 const themeBtn = document.getElementById('themeBtn');
 const themeIcon = document.getElementById('themeIcon');
