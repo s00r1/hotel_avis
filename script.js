@@ -245,9 +245,12 @@ document.getElementById('mainForm').onsubmit = function(e){
   e.preventDefault();
   let nom = document.getElementById('nom').value.trim();
   let chambre = document.getElementById('chambre').value.trim();
-  if (!nom || !chambre) { alert("Remplis nom + numéro de chambre, zebi !"); return; }
+  if (!nom || !chambre) {
+    alert("Veuillez renseigner votre nom et numéro de chambre");
+    return;
+  }
   if(multi.length === 0 && chemin.length === 0) {
-    alert("Ajoute au moins un signalement ou un avis, din’omk !");
+    alert("Veuillez ajouter au moins un signalement ou un avis");
     return;
   }
   if(chemin.length > 0) {
