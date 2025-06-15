@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Page de test - Hôtel Grill</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Page de test</h2>
+    <p>Contenu de l'objet <code>arbre</code> :</p>
+    <pre id="arbrePre"></pre>
+
+    <p>État courant des variables :</p>
+    <pre id="etatPre"></pre>
+
+    <p>Résumé des tests disponibles :</p>
+    <ul>
+      <li><code>genCodeIntervention.test.js</code> : vérifie le format du code unique.</li>
+      <li><code>conflictMessage.test.js</code> : contrôle la construction du message caché.</li>
+    </ul>
+  </div>
+
+  <!-- Formulaire masqué requis par script.js -->
+  <form id="mainForm" class="hidden">
+    <select id="chambre"></select>
+    <div id="multiList"></div>
+    <div id="wizard-area"></div>
+    <div class="btn-row hidden" id="btnRow">
+      <button type="button" id="add-btn"></button>
+      <button type="submit" id="send-btn"></button>
+    </div>
+    <input type="hidden" id="hiddenMessage" name="message">
+  </form>
+
+  <script src="script.js"></script>
+  <script>
+    function updateDisplay() {
+      const etat = {
+        chemin,
+        multi,
+        hiddenMessage: document.getElementById('hiddenMessage').value
+      };
+      document.getElementById('arbrePre').textContent = JSON.stringify(arbre, null, 2);
+      document.getElementById('etatPre').textContent = JSON.stringify(etat, null, 2);
+    }
+    window.addEventListener('load', updateDisplay);
+    document.addEventListener('click', updateDisplay);
+    document.addEventListener('input', updateDisplay);
+  </script>
+</body>
+</html>
