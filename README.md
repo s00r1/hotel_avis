@@ -10,6 +10,7 @@ cd hotel_avis
 npm install
 ```
 
+Cette commande télécharge notamment `jest` et `eslint`, indispensables pour exécuter `npm test` et `npm run lint`. Veillez à disposer d'un accès réseau lors de cette étape.
 Vous pouvez ensuite lancer les tests et le linter :
 
 ```bash
