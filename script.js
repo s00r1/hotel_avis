@@ -1,3 +1,5 @@
+/* eslint-env browser */
+/* global fetch, FormData */
 // --------- Générateur code unique ----------
 function genCodeIntervention() {
   const now = new Date();
@@ -84,6 +86,7 @@ let avisSaisie = "";
 let multi = [];
 let conflitChambres = [];
 let conflitComment = "";
+let lastSubmissionData = null;
 
 // Echappe les caract\xC3\xA8res HTML pour eviter l\x27interpretation des balises
 function escapeHtml(str) {
@@ -374,87 +377,8 @@ document.getElementById('mainForm').onsubmit = function(e){
 
   // Génère code intervention
   const codeInter = genCodeIntervention();
-  const jsPDF = window.jspdf?.jsPDF || window.jsPDF;
-  let savePromise;
-
-  try {
-    if (jsPDF) {
-      const doc = new jsPDF();
-      const nowGen = new Date(); // Date for PDF content
-      let dateStrGen = nowGen.toLocaleDateString('fr-FR');
-      let timeStrGen = nowGen.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
-      let y = 15;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      doc.text("Fiche de Signalement / Avis", 105, y, {align: "center"});
-      y += 9;
-      doc.setFontSize(12);
-      doc.setTextColor(80,80,250);
-      doc.text(codeInter, 105, y, {align: "center"});
-      doc.setTextColor(0,0,0);
-      y += 9;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.text("Date :", 14, y);
-      doc.text(dateStrGen, 40, y);
-      doc.text("Heure :", 100, y);
-      doc.text(timeStrGen, 120, y);
-      y += 8;
-      doc.text("Nom :", 14, y);
-      doc.text(nom, 40, y);
-      doc.text("Chambre :", 100, y);
-      doc.text(chambre, 120, y);
-      y += 12;
-      let sep = "________________________________________";
-      doc.setFontSize(12);
-      multi.forEach((item,i) => {
-        if (y > 260) { doc.addPage(); y = 15; }
-        doc.setFont('helvetica', 'bold');
-        if(item.type === "avis") {
-          doc.text(`Avis #${i+1} :`, 14, y);
-          y += 7;
-          doc.setFont('helvetica', 'normal');
-          doc.text(item.texte, 18, y);
-          y += 10;
-        } else {
-          let p = item.chemin.filter(x =>
-            x !== "Problème technique" && x !== "Signaler" && x !== "Chambre"
-            && x !== "Parties communes" && x !== "Nuisibles" && x !== "Électricité"
-            && x !== "Eau" && x !== "Donner un avis"
-          );
-          let titre = p[p.length-1] || item.chemin[item.chemin.length-1];
-          if (item.texte) titre += ` (${item.texte})`;
-          doc.text(`Signalement #${i+1} :`, 14, y);
-          y += 7;
-          doc.setFont('helvetica', 'normal');
-          doc.text(titre, 18, y);
-          y += 10;
-        }
-        doc.setFontSize(9);
-        doc.text(sep, 14, y);
-        y += 8;
-        doc.setFontSize(12);
-      });
-      savePromise = doc.save(`signalement_${codeInter}.pdf`, { returnPromise: true });
-      // Ensure savePromise is a promise, even if doc.save doesn't always return one under all conditions.
-      if (!(savePromise instanceof Promise)) {
-        savePromise = Promise.resolve(); // Or Promise.reject() if this case is an error
-      }
-    } else {
-      // If jsPDF is not available, we can't generate a PDF.
-      // Decide if this is an error or if submission should proceed without PDF.
-      // For now, let's assume PDF is critical and treat as an error.
-      throw new Error("Librairie PDF (jsPDF) non chargée.");
-    }
-  } catch (pdfError) {
-    console.error("Erreur lors de la génération ou sauvegarde initiale du PDF:", pdfError);
-    alert("Erreur lors de la génération du PDF : " + pdfError.message + "\nLe signalement ne sera pas envoyé.");
-    return; // Stop execution, do not proceed to AJAX
-  }
 
   // Prépare tout le contenu pour le champ caché message (pour Formspree)
-  // This needs to be done regardless of PDF outcome if submission is to be attempted.
-  // However, current logic stops if PDF fails. If PDF was optional, this would move.
   let hiddenMsg = '';
   const now = new Date(); // Date for Formspree message
   let dateStr = now.toLocaleDateString('fr-FR');
@@ -479,44 +403,43 @@ document.getElementById('mainForm').onsubmit = function(e){
   });
   document.getElementById('hiddenMessage').value = hiddenMsg;
 
-  savePromise.then(() => {
-    // This block executes if PDF generation try block was successful AND doc.save() promise resolved
-    const form = document.getElementById('mainForm');
-    const formData = new FormData(form);
-    const formAction = form.getAttribute('action');
+  const form = document.getElementById('mainForm');
+  const formData = new FormData(form);
+  const formAction = form.getAttribute('action');
 
-    fetch(formAction, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Accept': 'application/json'
-      }
-    }).then(response => {
-      if (response.ok) {
-        document.getElementById('mainForm').reset();
-        chemin = [];
-        autreSaisie = "";
-        avisSaisie = "";
-        conflitChambres = [];
-        conflitComment = "";
-        multi = [];
-        renderWizard();
-        renderMultiList();
-        alert("Signalement envoyé avec succès !");
-      } else {
-        response.json().then(data => {
-          if (Object.hasOwn(data, 'errors')) {
-            alert("Erreur d'envoi: " + data["errors"].map(error => error["message"]).join(", "));
-          } else {
-            alert("Erreur d'envoi du formulaire.");
-          }
-        }).catch(err => {
-          alert("Erreur d'envoi et erreur lors de l'analyse de la réponse d'erreur. Statut: " + response.status);
-        });
-      }
-    }).catch(error => {
-      alert("Erreur réseau ou autre problème lors de l'envoi : " + error.toString());
-    });
+  fetch(formAction, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Accept': 'application/json'
+    }
+  }).then(response => {
+    if (response.ok) {
+      lastSubmissionData = { nom, chambre, multi: JSON.parse(JSON.stringify(multi)), codeInter };
+      document.getElementById('download-btn').classList.remove('hidden');
+      document.getElementById('mainForm').reset();
+      chemin = [];
+      autreSaisie = "";
+      avisSaisie = "";
+      conflitChambres = [];
+      conflitComment = "";
+      multi = [];
+      renderWizard();
+      renderMultiList();
+      alert("Signalement envoyé avec succès !");
+    } else {
+      response.json().then(data => {
+        if (Object.hasOwn(data, 'errors')) {
+          alert("Erreur d'envoi: " + data["errors"].map(error => error["message"]).join(", "));
+        } else {
+          alert("Erreur d'envoi du formulaire.");
+        }
+      }).catch(() => {
+        alert("Erreur d'envoi et erreur lors de l'analyse de la réponse d'erreur. Statut: " + response.status);
+      });
+    }
+  }).catch(error => {
+    alert("Erreur réseau ou autre problème lors de l'envoi : " + error.toString());
   });
 
   return false;
@@ -545,3 +468,77 @@ if(themeBtn){
   let theme = localStorage.getItem('hotel_theme') || 'light';
   setTheme(theme);
 })();
+
+function generatePdf(data) {
+  const { nom, chambre, multi, codeInter } = data;
+  const jsPDF = window.jspdf?.jsPDF || window.jsPDF;
+  if (!jsPDF) { alert('Librairie PDF (jsPDF) non chargée.'); return; }
+  const doc = new jsPDF();
+  const nowGen = new Date();
+  let dateStrGen = nowGen.toLocaleDateString('fr-FR');
+  let timeStrGen = nowGen.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  let y = 15;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.text('Fiche de Signalement / Avis', 105, y, {align:'center'});
+  y += 9;
+  doc.setFontSize(12);
+  doc.setTextColor(80,80,250);
+  doc.text(codeInter, 105, y, {align:'center'});
+  doc.setTextColor(0,0,0);
+  y += 9;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text('Date :', 14, y);
+  doc.text(dateStrGen, 40, y);
+  doc.text('Heure :', 100, y);
+  doc.text(timeStrGen, 120, y);
+  y += 8;
+  doc.text('Nom :', 14, y);
+  doc.text(nom, 40, y);
+  doc.text('Chambre :', 100, y);
+  doc.text(chambre, 120, y);
+  y += 12;
+  let sep = '________________________________________';
+  doc.setFontSize(12);
+  multi.forEach((item,i) => {
+    if (y > 260) { doc.addPage(); y = 15; }
+    doc.setFont('helvetica','bold');
+    if(item.type === 'avis') {
+      doc.text(`Avis #${i+1} :`, 14, y);
+      y += 7;
+      doc.setFont('helvetica','normal');
+      doc.text(item.texte, 18, y);
+      y += 10;
+    } else {
+      let p = item.chemin.filter(x =>
+        x !== 'Problème technique' && x !== 'Signaler' && x !== 'Chambre'
+        && x !== 'Parties communes' && x !== 'Nuisibles' && x !== 'Électricité'
+        && x !== 'Eau' && x !== 'Donner un avis'
+      );
+      let titre = p[p.length-1] || item.chemin[item.chemin.length-1];
+      if (item.texte) titre += ` (${item.texte})`;
+      doc.text(`Signalement #${i+1} :`, 14, y);
+      y += 7;
+      doc.setFont('helvetica','normal');
+      doc.text(titre, 18, y);
+      y += 10;
+    }
+    doc.setFontSize(9);
+    doc.text(sep, 14, y);
+    y += 8;
+    doc.setFontSize(12);
+  });
+  doc.save(`signalement_${codeInter}.pdf`);
+}
+
+const downloadBtn = document.getElementById('download-btn');
+if (downloadBtn) {
+  downloadBtn.onclick = () => {
+    if (!lastSubmissionData) {
+      alert('Aucun signalement à exporter.');
+      return;
+    }
+    generatePdf(lastSubmissionData);
+  };
+}

@@ -1,6 +1,8 @@
 # Outil de signalement et d'avis
 
-Ce petit projet propose un formulaire permettant aux clients de signaler un problème technique ou de laisser un avis concernant leur séjour à l'hôtel. Lors de la soumission, un PDF récapitulatif est généré grâce à la librairie **jsPDF** puis le contenu du formulaire est envoyé via **Formspree**.
+Ce petit projet propose un formulaire permettant aux clients de signaler un problème technique ou de laisser un avis concernant leur séjour à l'hôtel. Le contenu du formulaire est envoyé via **Formspree** et un bouton permet ensuite de télécharger un PDF récapitulatif grâce à la librairie **jsPDF**.
+
+Après un envoi réussi, le bouton **Télécharger la fiche** apparaît pour générer ce PDF à la demande.
 
 ## Cloner le dépôt
 
