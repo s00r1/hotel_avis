@@ -15,12 +15,13 @@ This document outlines manual test cases to verify the enhanced form submission 
     7.  Verify the item appears in the "Récapitulatif" list.
     8.  Click the "Envoyer le formulaire" button.
 *   **Expected Outcome**:
-    1.  A PDF file (e.g., `signalement_GRILL-YYYYMMDD-HHMM-XXXX.pdf`) is downloaded by the browser.
-    2.  An alert box appears with the message: "Signalement envoyé avec succès ! Le PDF a été téléchargé."
-    3.  The "Nom et Prénom" and "Chambre" fields are cleared/reset.
-    4.  The wizard area resets to its initial state.
-    5.  The "Récapitulatif" list is cleared.
-    6.  **(Requires Formspree setup)** Check the email inbox configured for the Formspree endpoint. An email should be received containing the submitted details (Name, Room, Code Intervention, and the list of signalements/avis). The content of the `hiddenMessage` field should be present in the email body.
+    1.  Un bouton "Télécharger la fiche" apparaît pour générer le PDF.
+    2.  Après avoir cliqué sur ce bouton, un fichier `signalement_GRILL-YYYYMMDD-HHMM-XXXX.pdf` est téléchargé.
+    3.  Un message "Signalement envoyé avec succès !" s'affiche.
+    4.  The "Nom et Prénom" and "Chambre" fields are cleared/reset.
+    5.  The wizard area resets to its initial state.
+    6.  The "Récapitulatif" list is cleared.
+    7.  **(Requires Formspree setup)** Check the email inbox configured for the Formspree endpoint. An email should be received containing the submitted details (Name, Room, Code Intervention, and the list of signalements/avis). The content of the `hiddenMessage` field should be present in the email body.
 
 ## 2. Successful Submission (Mobile)
 
@@ -33,14 +34,12 @@ This document outlines manual test cases to verify the enhanced form submission 
     5.  Click "Ajouter au formulaire".
     6.  Click "Envoyer le formulaire".
 *   **Expected Outcome**:
-    1.  PDF download/viewing behavior:
-        *   On some mobile browsers, the PDF might open directly in a viewer.
-        *   On others, it might prompt to download or save the file.
-        *   Verify the PDF content is correct.
-    2.  An alert box appears with the message: "Signalement envoyé avec succès ! Le PDF a été téléchargé."
-    3.  The form fields are reset.
-    4.  The wizard and récapitulatif are reset.
-    5.  **(Requires Formspree setup)** An email is received at the Formspree configured email address with correct report details.
+    1.  Un bouton "Télécharger la fiche" apparaît pour générer le PDF.
+    2.  Après avoir cliqué sur ce bouton, le fichier est téléchargé ou affiché selon le navigateur.
+    3.  Un message "Signalement envoyé avec succès !" s'affiche.
+    4.  The form fields are reset.
+    5.  The wizard and récapitulatif are reset.
+    6.  **(Requires Formspree setup)** An email is received at the Formspree configured email address with correct report details.
 
 ## 3. Validation Error: Missing Name/Room
 
