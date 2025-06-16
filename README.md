@@ -99,5 +99,5 @@ Les lignes 491&nbsp;à&nbsp;504 réalisent notamment :
 
 ## Licence
 
-Ce projet est distribué sous licence [MIT](LICENSE). Des versions du présent fichier existent en anglais et en arabe dans `README.en.md` et `README.ar.md`.
+Ce projet est distribué sous licence [MIT](LICENSE). Des versions du présent fichier existent en anglais et en arabe dans [README.en.md](README.en.md) et `README.ar.md`.
 
