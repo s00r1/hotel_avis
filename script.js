@@ -29,7 +29,7 @@ const arbre = {
   "Nuisibles": ["Cafards", "Punaises de lit"],
   "Clés": ["Clé perdue", "Clé cassée", "Clé retrouvée"],
   "Parties communes": ["Problème lave-linge", "Problème sèche-linge", "Problème cuisine", "Problème casiers", "Autres"],
-  "Incident": ["Conflit", "Alarme incendie"],
+  "Incident": ["Conflit", "Alarme incendie", "Vol"],
   "Conflit": [
     "Conflit entre plusieurs chambres",
     "Conflit dans la même famille",
@@ -61,6 +61,7 @@ const CHOIX_STYLES = {
   "Incident":       { color:"rouge",   icon:'⚠️' },
   "Conflit":        { color:"rouge",   icon:'⚔️' },
   "Alarme incendie":{ color:"orange",  icon:'🚨' },
+  "Vol":            { color:"rouge",   icon:'👜' },
   "Conflit entre plusieurs chambres":       { color:"rouge", icon:'🏘️' },
   "Conflit dans la même famille":            { color:"rouge", icon:'👪' },
   "Conflit avec personne extérieure à l'hôtel": { color:"rouge", icon:'🚶' },
@@ -91,6 +92,9 @@ let avisSaisie = "";
 let multi = [];
 let conflitChambres = [];
 let conflitComment = "";
+let volDescription = "";
+let volObjets = "";
+let volChambres = [];
 let lastSubmissionData = null;
 
 // Echappe les caract\xC3\xA8res HTML pour eviter l\x27interpretation des balises
@@ -168,6 +172,9 @@ function renderWizard() {
       avisSaisie = "";
       conflitChambres = [];
       conflitComment = "";
+      volDescription = "";
+      volObjets = "";
+      volChambres = [];
       renderWizard();
     }
     area.appendChild(backBtn);
@@ -184,6 +191,9 @@ function renderWizard() {
         avisSaisie = "";
         conflitChambres = [];
         conflitComment = "";
+        volDescription = "";
+        volObjets = "";
+        volChambres = [];
         renderWizard();
       }
       bc.appendChild(sp);
@@ -262,6 +272,53 @@ function renderWizard() {
     btnRow.classList.remove('hidden');
     return;
   }
+  if (last === "Vol") {
+    if(volChambres.length === 0) volChambres.push("");
+    const labDesc = document.createElement('label');
+    labDesc.textContent = "Descriptif du vol :";
+    area.appendChild(labDesc);
+    const taDesc = document.createElement('textarea');
+    taDesc.rows = 3;
+    taDesc.value = volDescription;
+    taDesc.oninput = e => volDescription = e.target.value;
+    area.appendChild(taDesc);
+    const labObj = document.createElement('label');
+    labObj.textContent = "Objet(s) volé(s) :";
+    area.appendChild(labObj);
+    const taObj = document.createElement('textarea');
+    taObj.rows = 2;
+    taObj.value = volObjets;
+    taObj.oninput = e => volObjets = e.target.value;
+    area.appendChild(taObj);
+    const labelCh = document.createElement('label');
+    labelCh.textContent = "Chambres suspectées (optionnel) :";
+    area.appendChild(labelCh);
+    const listV = document.createElement('div');
+    listV.className = 'chambres-list';
+    volChambres.forEach((val, idx) => {
+      const div = document.createElement('div');
+      div.className = 'chambre-item';
+      const sel = createChambreSelect(val);
+      sel.onchange = e => volChambres[idx] = e.target.value;
+      div.appendChild(sel);
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del-chambre-btn';
+      del.textContent = '×';
+      del.onclick = () => { volChambres.splice(idx,1); renderWizard(); };
+      div.appendChild(del);
+      listV.appendChild(div);
+    });
+    area.appendChild(listV);
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'add-chambre-btn';
+    add.textContent = '+';
+    add.onclick = () => { volChambres.push(""); renderWizard(); };
+    area.appendChild(add);
+    btnRow.classList.remove('hidden');
+    return;
+  }
   if (chemin.length > 0 && arbre[chemin[chemin.length-1]] === undefined) {
     if (chemin[chemin.length-1] === "Autres") {
       const label = document.createElement('label');
@@ -325,6 +382,14 @@ document.getElementById('add-btn').onclick = function() {
       if(last === "Conflit avec personne extérieure à l'hôtel" && conflitComment.trim()) {
         texte += (texte ? ' - ' : '') + conflitComment.trim();
       }
+    } else if(last === "Vol") {
+      if(!volDescription.trim() && !volObjets.trim() && volChambres.filter(x=>x).length===0) {
+        alert("Renseigne au moins un détail sur le vol !"); return;
+      }
+      if(volDescription.trim()) texte = volDescription.trim();
+      if(volObjets.trim()) texte += (texte ? ' - ' : '') + 'Objets: ' + volObjets.trim();
+      let chs = volChambres.filter(x=>x).join(', ');
+      if(chs) texte += (texte ? ' - ' : '') + 'Chambres suspectes: ' + chs;
     }
     multi.push({type: "signalement", chemin: [...chemin], texte});
   }
@@ -334,6 +399,9 @@ document.getElementById('add-btn').onclick = function() {
   avisSaisie = "";
   conflitChambres = [];
   conflitComment = "";
+  volDescription = "";
+  volObjets = "";
+  volChambres = [];
   renderWizard();
 }
 
@@ -368,6 +436,14 @@ document.getElementById('mainForm').onsubmit = function(e){
         if(last === "Conflit avec personne extérieure à l'hôtel" && conflitComment.trim()) {
           texte += (texte ? ' - ' : '') + conflitComment.trim();
         }
+      } else if(last === "Vol") {
+        if(!volDescription.trim() && !volObjets.trim() && volChambres.filter(x=>x).length===0) {
+          alert("Renseigne au moins un détail sur le vol !"); return;
+        }
+        if(volDescription.trim()) texte = volDescription.trim();
+        if(volObjets.trim()) texte += (texte ? ' - ' : '') + 'Objets: ' + volObjets.trim();
+        let chs = volChambres.filter(x=>x).join(', ');
+        if(chs) texte += (texte ? ' - ' : '') + 'Chambres suspectes: ' + chs;
       }
       multi.push({type: "signalement", chemin: [...chemin], texte});
     }
@@ -377,6 +453,9 @@ document.getElementById('mainForm').onsubmit = function(e){
     avisSaisie = "";
     conflitChambres = [];
     conflitComment = "";
+    volDescription = "";
+    volObjets = "";
+    volChambres = [];
     renderWizard();
   }
 
@@ -428,6 +507,9 @@ document.getElementById('mainForm').onsubmit = function(e){
       avisSaisie = "";
       conflitChambres = [];
       conflitComment = "";
+      volDescription = "";
+      volObjets = "";
+      volChambres = [];
       multi = [];
       renderWizard();
       renderMultiList();
