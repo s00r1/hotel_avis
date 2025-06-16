@@ -255,6 +255,7 @@ function renderWizard() {
       area.appendChild(lab);
       const ta = document.createElement('textarea');
       ta.rows = 3;
+      ta.placeholder = "Décris le conflit...";
       ta.value = conflitComment;
       ta.oninput = e => conflitComment = e.target.value;
       area.appendChild(ta);
