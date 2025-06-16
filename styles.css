@@ -144,7 +144,7 @@ select, input, textarea {
   filter: brightness(0.95);
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 .btn-row {
   display: flex;
