@@ -18,7 +18,7 @@ const arbre = {
   "": ["Signaler", "Donner un avis"],
   "Signaler": ["Problème technique", "Incident"],
   "Problème technique": ["Chambre", "Parties communes", "Autres"],
-  "Chambre": ["Eau", "Électricité", "Nuisibles", "Autres"],
+  "Chambre": ["Eau", "Électricité", "Nuisibles", "Clés", "Autres"],
   "Eau": ["WC", "Douche"],
   "WC": ["Chasse d'eau HS", "Fuite d'eau", "WC bouché"],
   "Douche": ["Fuite d'eau", "Mitigeur", "Flexible", "Pommeau de douche", "Douche bouchée"],
@@ -27,6 +27,7 @@ const arbre = {
   "Lumières": ["Lumière chambre", "Lumière salle de bain"],
   "Chauffage": ["Chauffage HS"],
   "Nuisibles": ["Cafards", "Punaises de lit"],
+  "Clés": ["Clé perdue", "Clé cassée", "Clé retrouvée"],
   "Parties communes": ["Problème lave-linge", "Problème sèche-linge", "Problème cuisine", "Problème casiers", "Autres"],
   "Incident": ["Conflit", "Alarme incendie"],
   "Conflit": [
@@ -66,6 +67,10 @@ const CHOIX_STYLES = {
   "Nuisibles":      { color:"vert",    icon:'🐞' },
   "Cafards":        { color:"vert",    icon:'🪳' },
   "Punaises de lit":{ color:"vert",    icon:'🛏️' },
+  "Clés":           { color:"gris",    icon:'🔑' },
+  "Clé perdue":     { color:"gris",    icon:'🔑' },
+  "Clé cassée":     { color:"gris",    icon:'🔑' },
+  "Clé retrouvée":  { color:"gris",    icon:'🔑' },
 
   "Parties communes":{color:"violet",  icon:'🏢' },
   "Problème lave-linge": {color:"violet", icon:'🧺' },
@@ -394,7 +399,7 @@ document.getElementById('mainForm').onsubmit = function(e){
       let p = item.chemin.filter(x =>
         x !== "Problème technique" && x !== "Signaler" && x !== "Chambre"
         && x !== "Parties communes" && x !== "Nuisibles" && x !== "Électricité"
-        && x !== "Eau" && x !== "Donner un avis"
+        && x !== "Eau" && x !== "Clés" && x !== "Donner un avis"
       );
       let titre = p[p.length-1] || item.chemin[item.chemin.length-1];
       if (item.texte) titre += ` (${item.texte})`;
@@ -514,7 +519,7 @@ function generatePdf(data) {
       let p = item.chemin.filter(x =>
         x !== 'Problème technique' && x !== 'Signaler' && x !== 'Chambre'
         && x !== 'Parties communes' && x !== 'Nuisibles' && x !== 'Électricité'
-        && x !== 'Eau' && x !== 'Donner un avis'
+        && x !== 'Eau' && x !== 'Clés' && x !== 'Donner un avis'
       );
       let titre = p[p.length-1] || item.chemin[item.chemin.length-1];
       if (item.texte) titre += ` (${item.texte})`;

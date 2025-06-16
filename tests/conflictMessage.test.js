@@ -14,7 +14,7 @@ const buildHiddenMessage = (nom, chambre, codeInter, multi) => {
       let p = item.chemin.filter(x =>
         x !== 'Problème technique' && x !== 'Signaler' && x !== 'Chambre' &&
         x !== 'Parties communes' && x !== 'Nuisibles' && x !== 'Électricité' &&
-        x !== 'Eau' && x !== 'Donner un avis'
+        x !== 'Eau' && x !== 'Clés' && x !== 'Donner un avis'
       );
       let titre = p[p.length-1] || item.chemin[item.chemin.length-1];
       if (item.texte) titre += ` (${item.texte})`;
@@ -36,7 +36,7 @@ test('informations de conflit multiple dans hiddenMessage et PDF', () => {
     let p = item.chemin.filter(x =>
       x !== 'Problème technique' && x !== 'Signaler' && x !== 'Chambre' &&
       x !== 'Parties communes' && x !== 'Nuisibles' && x !== 'Électricité' &&
-      x !== 'Eau' && x !== 'Donner un avis'
+      x !== 'Eau' && x !== 'Clés' && x !== 'Donner un avis'
     );
     let titre = p[p.length-1] || item.chemin[item.chemin.length-1];
     if(item.texte) titre += ` (${item.texte})`;
