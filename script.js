@@ -280,6 +280,7 @@ function renderWizard() {
     area.appendChild(labDesc);
     const taDesc = document.createElement('textarea');
     taDesc.rows = 3;
+    taDesc.placeholder = "expliquez comment et quand c'est déroulé le vol";
     taDesc.value = volDescription;
     taDesc.oninput = e => volDescription = e.target.value;
     area.appendChild(taDesc);
@@ -288,6 +289,7 @@ function renderWizard() {
     area.appendChild(labObj);
     const taObj = document.createElement('textarea');
     taObj.rows = 2;
+    taObj.placeholder = "quels objets ont été volés ?";
     taObj.value = volObjets;
     taObj.oninput = e => volObjets = e.target.value;
     area.appendChild(taObj);
